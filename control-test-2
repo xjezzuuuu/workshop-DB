@@ -1,0 +1,31 @@
+1) -create tablespace "store_tbs1" datafile '+data' size 50m, '+data' size 50m ;
+
+2) -select tablespace_name, status, contents from dba_tablespaces
+    where tablespace_name like 'STORE_TBS1';
+   
+	-select file_name, status, bytes / 1024 / 1024 as MB from dba_data_files; 
+   	
+	-select dba_tablespaces.tablespaces_name, dba_tablespaces.status, dba_tablespaces.contents, dba_data_files.file_name, dba_data_files.status,
+    	dba_data_files.bytes / 1024 / 1024 as MB from dba_tablespaces 
+    	join dba_data_files on dba_tablespaces.tablespace_name = dba_data_files.tablespace_name			
+
+3) -create profile PROFILE1 limit sessions_per_user 1;
+   -alter system set resource_limit = true;
+
+4) -select profile, limit from dba_profiles where profile like 'PROFILE1';
+
+5) -create role role1;
+	-grant create session to role1;
+	-grant create table to role1;
+	-grant create sequence to role1;
+	-grant create trigger to role1;
+	-grant create procedure to role1;
+
+6) -select * from role_sys_privs where role like 'ROLE1';
+
+7) -create user "STORE" profile "PROFILE1" identified by bodega default tablespace "STORE_TBS1" temporary tablespace "TEMP" account unlock;
+   -grant "ROLE1" to "STORE";
+
+8) -select dba_users.username, dba_users.account_status, dba_users.default_tablespace, dba_users.temporary_tablespace, dba_users.profile, dba_role_privs.granted_role
+    from dba_users
+    join dba_role_privs on dba_users.username = dba_role_privs.grantee where grantee like 'STORE';z
